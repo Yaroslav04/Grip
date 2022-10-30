@@ -1,4 +1,6 @@
-﻿namespace Grip;
+﻿using Grip.Platforms.Android;
+
+namespace Grip;
 
 public static class MauiProgram
 {
@@ -13,6 +15,9 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
 
-		return builder.Build();
+        Android.Content.Intent intent = new Android.Content.Intent(Android.App.Application.Context, typeof(ForegroundServices));
+        Android.App.Application.Context.StartForegroundService(intent);
+
+        return builder.Build();
 	}
 }

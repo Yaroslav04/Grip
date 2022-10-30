@@ -67,6 +67,11 @@ namespace Grip.Core.Services.DataBase
         {
             return await taskDataBase.Table<TaskClass>().ToListAsync();
         }
+        public async Task<TaskClass> GetTaskAsync(int _id)
+        {
+            return await taskDataBase.Table<TaskClass>().Where(x => x.N == _id).FirstOrDefaultAsync();
+        }
+
 
         #endregion
 
@@ -108,9 +113,19 @@ namespace Grip.Core.Services.DataBase
 
         }
 
-        public async Task<List<PeriodClass>> GetPeriodAsync()
+        public async Task<List<PeriodClass>> GetPeriodsAsync()
         {
             return await periodDataBase.Table<PeriodClass>().ToListAsync();
+        }
+
+        public async Task<List<PeriodClass>> GetPeriodsAsync(int _id)
+        {
+            return await periodDataBase.Table<PeriodClass>().Where(x => x.Id == _id).ToListAsync();
+        }
+
+        public async Task<PeriodClass> GetPeriodAsync(int _id)
+        {
+            return await periodDataBase.Table<PeriodClass>().Where(x => x.N == _id).FirstOrDefaultAsync();
         }
 
         #endregion
@@ -153,9 +168,32 @@ namespace Grip.Core.Services.DataBase
 
         }
 
-        public async Task<List<ObjectClass>> GetObjectAsync()
+        public async Task<List<ObjectClass>> GetObjectsAsync()
         {
             return await objectDataBase.Table<ObjectClass>().ToListAsync();
+        }
+
+        public async Task<ObjectClass> GetObjectAsync(int _taskId, int _periodId, int _day)
+        {
+            return await objectDataBase.Table<ObjectClass>()
+                .Where(x => x.TaskId == _taskId & x.PeriodId == _periodId
+                & DateTime.Now.DayOfYear == _day).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> IsObjectExistAsync(int _taskId, int _periodId, int _day)
+        {
+            var s = await objectDataBase.Table<ObjectClass>()
+                .Where(x => x.TaskId  == _taskId & x.PeriodId == _periodId 
+                & DateTime.Now.DayOfYear == _day).ToListAsync();
+
+            if (s.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         #endregion

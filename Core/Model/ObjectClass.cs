@@ -11,6 +11,7 @@ namespace Grip.Core.Model
         public int PeriodId { get; set; }
         public TimeSpan NotificationTime { get; set; }
         public int Status { get; set; }
+        public int Day { get; set; }
         public DateTime SaveDate { get; set; }
 
     }
