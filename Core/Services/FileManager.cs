@@ -17,5 +17,13 @@ namespace Grip.Core.Services
         {
             return Path.Combine(AppPath(), _file);
         }
+
+        public static void WriteLog(string _teg, string _value)
+        {
+            using (StreamWriter sw = new StreamWriter(AppPath("log.txt"), append: true))
+            {
+                sw.WriteLine($"{DateTime.Now}\t{_teg}\t{_value}");
+            }
+        }
     }
 }

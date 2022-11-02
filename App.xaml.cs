@@ -33,6 +33,8 @@ public partial class App : Application
         }
     }
 
+    public static bool IsServiseRunning = false;
+
     public static List<string> PeriodTypes
     {
         get

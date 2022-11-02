@@ -8,7 +8,7 @@ namespace Grip.Core.Model
         [NotNull]
         public int N { get; set; }
         [Indexed(Name = "ListingID", Order = 1, Unique = true)]
-        public int Type { get; set; }
+        public string Type { get; set; }
         [Indexed(Name = "ListingID", Order = 2, Unique = true)]
         public string Name { get; set; }
         public string Descripton { get; set; }

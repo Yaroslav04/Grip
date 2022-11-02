@@ -1,4 +1,6 @@
-﻿using Debug = System.Diagnostics.Debug;
+﻿using Grip.Core.Services.UI;
+using Grip.Platforms.Android;
+using Debug = System.Diagnostics.Debug;
 
 namespace Grip;
 
@@ -7,150 +9,10 @@ public partial class MainPage : ContentPage
 	public MainPage()
 	{
 		InitializeComponent();
-		
-    }
-
-    private async Task Add()
-    {
-
-        //1
-        await App.DataBase.SaveTaskAsync(new TaskClass
-        {
-            Type = 1,
-            Name = "Левофлоксацин",
-            IsActive = true,
-            SaveDate = DateTime.Now
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 1,
-            ControlTime = TimeSpan.FromMinutes(9),
-            StopTime = TimeSpan.FromHours(14),
-            IsActive = true
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 1,
-            ControlTime = TimeSpan.FromHours(14),
-            StopTime = TimeSpan.FromHours(19),
-            IsActive = true
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 1,
-            ControlTime = TimeSpan.FromHours(19),
-            StopTime = TimeSpan.FromHours(22),
-            IsActive = true
-        });
-
-    //2
-        await App.DataBase.SaveTaskAsync(new TaskClass
-        {
-            Type = 1,
-            Name = "Назонекс",
-            IsActive = true,
-            SaveDate = DateTime.Now
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 2,
-            ControlTime = TimeSpan.FromMinutes(9) + TimeSpan.FromMinutes(30),
-            StopTime = TimeSpan.FromHours(14) + TimeSpan.FromMinutes(30),
-            IsActive = true
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 2,
-            ControlTime = TimeSpan.FromHours(14) + TimeSpan.FromMinutes(30),
-            StopTime = TimeSpan.FromHours(19) + TimeSpan.FromMinutes(30),
-            IsActive = true
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 2,
-            ControlTime = TimeSpan.FromHours(19) + TimeSpan.FromMinutes(30),
-            StopTime = TimeSpan.FromHours(22) + TimeSpan.FromMinutes(30),
-            IsActive = true
-        });
-
-        //3
-        await App.DataBase.SaveTaskAsync(new TaskClass
-        {
-            Type = 1,
-            Name = "Дексаметазон",
-            IsActive = true,
-            SaveDate = DateTime.Now
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 3,
-            ControlTime = TimeSpan.FromMinutes(10),
-            StopTime = TimeSpan.FromHours(15),
-            IsActive = true
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 3,
-            ControlTime = TimeSpan.FromHours(15),
-            StopTime = TimeSpan.FromHours(20),
-            IsActive = true
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 3,
-            ControlTime = TimeSpan.FromHours(20),
-            StopTime = TimeSpan.FromHours(23),
-            IsActive = true
-        });
-
-        //4
-
-        await App.DataBase.SaveTaskAsync(new TaskClass
-        {
-            Type = 1,
-            Name = "Медетром",
-            IsActive = true,
-            SaveDate = DateTime.Now
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 4,
-            ControlTime = TimeSpan.FromMinutes(10) + TimeSpan.FromMinutes(30),
-            StopTime = TimeSpan.FromHours(15) + TimeSpan.FromMinutes(30),
-            IsActive = true
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 4,
-            ControlTime = TimeSpan.FromHours(15) + TimeSpan.FromMinutes(30),
-            StopTime = TimeSpan.FromHours(20) + TimeSpan.FromMinutes(30),
-            IsActive = true
-        });
-
-        await App.DataBase.SavePeriodAsync(new PeriodClass
-        {
-            Id = 4,
-            ControlTime = TimeSpan.FromHours(20) + TimeSpan.FromMinutes(30),
-            StopTime = TimeSpan.FromHours(23),
-            IsActive = true
-        });
-
     }
 
     async void Run()
-	{
-        //await Add();
+	{ 
 
         foreach (var obj in await App.DataBase.GetObjectsAsync())
         {
@@ -170,6 +32,67 @@ public partial class MainPage : ContentPage
     private void run_Clicked(object sender, EventArgs e)
     {
         Run();
+    }
+
+    private async void addTask_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            var task = await PromtCRUD.CreateTask();
+            if (task == null)
+            {
+                throw new Exception("Ошибка promt");
+            }
+            
+            await App.DataBase.SaveTaskAsync(task);
+            await Shell.Current.DisplayAlert($"Добавить task", $"Сохранено", "ОК");
+        }
+        catch(Exception ex)
+        {
+            await Shell.Current.DisplayAlert($"Добавить task", $"Ошибка {ex.Message}", "ОК");
+        }
+        
+    }
+
+    private async void addPeriod_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            var period = await PromtCRUD.CreatePeriod();
+            if (period == null)
+            {
+                throw new Exception("Ошибка promt");
+            }
+
+            await App.DataBase.SavePeriodAsync(period);
+            await Shell.Current.DisplayAlert($"Добавить period", $"Сохранено", "ОК");
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert($"Добавить period", $"Ошибка {ex.Message}", "ОК");
+        }
+    }
+
+    private async void runServise_Clicked(object sender, EventArgs e)
+    {
+        if (!App.IsServiseRunning)
+        {
+            Android.Content.Intent intent = new Android.Content.Intent(Android.App.Application.Context, typeof(ForegroundServices));
+            Android.App.Application.Context.StartForegroundService(intent);
+            App.IsServiseRunning = true;
+            await Shell.Current.DisplayAlert($"Запуск сервиса", $"Запущено", "ОК");
+        }
+    }
+
+    private async void stopServise_Clicked(object sender, EventArgs e)
+    {
+        if (App.IsServiseRunning)
+        {
+            Android.Content.Intent intent = new Android.Content.Intent(Android.App.Application.Context, typeof(ForegroundServices));
+            Android.App.Application.Context.StopService(intent);
+            App.IsServiseRunning = false;
+            await Shell.Current.DisplayAlert($"Запуск сервиса", $"Остановлено", "ОК");
+        }
     }
 }
 

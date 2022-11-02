@@ -36,21 +36,26 @@ namespace Grip.Platforms.Android
 
                     //**********Message
 
-                    var s = await Task.Run(() => DataAgregator.Run());
-
-                    if (s.Count > 0)
+                    try
                     {
-                        string message = "";
-                        foreach (var item in s)
-                        {
-                            message = message + $"{item.TaskSoket.Name}, ";   
-                        }
-                        SendNotification(message);
-                    }               
-           
-                    //**********Message
+                        var s = await Task.Run(() => DataAgregator.Run());
 
-                    
+                        if (s.Count > 0)
+                        {
+                            string message = "";
+                            foreach (var item in s)
+                            {
+                                message = message + $"{item.TaskSoket.Name}, ";
+                            }
+                            SendNotification(message);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        FileManager.WriteLog("foreground servise", ex.Message);
+                    }
+                                    
+                    //**********Message              
                 }
             });
 
@@ -62,9 +67,9 @@ namespace Grip.Platforms.Android
             
 
             var notificationBuilder = new NotificationCompat.Builder(this, channelID)
-                                         .SetContentTitle("ForeGroundServiceStarted")
+                                         .SetContentTitle("Grip ServiceStarted")
                                          .SetSmallIcon(Resource.Mipmap.appicon_background)
-                                         .SetContentText("Service Running in Foreground")
+                                         .SetContentText("Grip Running in Foreground")
                                          .SetPriority(1)
                                          .SetOngoing(true)
                                          .SetChannelId(channelID)
@@ -105,14 +110,14 @@ namespace Grip.Platforms.Android
 
         public void SendNotification(string message)
         {
-            string channelID = "MessageChannel3";
+            string channelID = "NotificationChannel";
             var SnotificationManager = (NotificationManager)GetSystemService(NotificationService);
 
                 var notfificationChannel = new NotificationChannel(channelID, channelID, NotificationImportance.High);
                 SnotificationManager.CreateNotificationChannel(notfificationChannel);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelID)
-            .SetContentTitle("Sample Notification")
+            .SetContentTitle("Notification")
             .SetContentText(message)
             .SetSmallIcon(Resource.Drawable.abc_ic_arrow_drop_right_black_24dp);
 

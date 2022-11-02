@@ -15,9 +15,6 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
 
-        Android.Content.Intent intent = new Android.Content.Intent(Android.App.Application.Context, typeof(ForegroundServices));
-        Android.App.Application.Context.StartForegroundService(intent);
-
         return builder.Build();
 	}
 }
