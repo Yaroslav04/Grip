@@ -13,6 +13,7 @@ namespace Grip.Core.Model
         public string Name { get; set; }
         public string Descripton { get; set; }
         public bool IsActive { get; set; }
+        public bool IsVisible { get; set; }
         public DateTime SaveDate { get; set; }
     }
 }
