@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Grip.Core.Services.DataBase
+namespace Grip.Core.Services.Parser
 {
     public static class PeriodParser
     {
@@ -16,7 +16,7 @@ namespace Grip.Core.Services.DataBase
             if (!IsBetweenStartEndDay(_period))
             {
                 return false;
-            }       
+            }
 
             /*0*/
             if (period == 0)

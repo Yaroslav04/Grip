@@ -10,5 +10,8 @@ global using Grip.Core.Model;
 global using Grip.Core.Services.DataBase;
 global using Grip.Core.Services;
 global using Grip.Core.Notification;
+global using Grip.Core.View;
+global using Grip.Core.ViewModel;
+
 
 

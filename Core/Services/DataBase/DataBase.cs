@@ -173,6 +173,11 @@ namespace Grip.Core.Services.DataBase
             return await objectDataBase.Table<ObjectClass>().ToListAsync();
         }
 
+        public async Task<ObjectClass> GetObjectAsync(int _id)
+        {
+            return await objectDataBase.Table<ObjectClass>().Where(x => x.N == _id).FirstOrDefaultAsync();
+        }
+
         public async Task<ObjectClass> GetObjectAsync(int _taskId, int _periodId, int _day)
         {
             return await objectDataBase.Table<ObjectClass>()

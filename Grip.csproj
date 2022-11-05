@@ -52,4 +52,10 @@
 	  <PackageReference Include="sqlite-net-pcl" Version="1.6.292" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <MauiXaml Update="Core\View\ExecutePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>

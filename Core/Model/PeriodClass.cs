@@ -17,6 +17,7 @@ namespace Grip.Core.Model
         public bool IsActive { get; set; }
         public bool IsNotify { get; set; }
         public bool IsVisible { get; set; }
+        public bool IsAutoDayEnd { get; set; }
         public DateTime SaveDate { get; set; }
 
     }

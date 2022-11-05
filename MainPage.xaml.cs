@@ -11,29 +11,6 @@ public partial class MainPage : ContentPage
 		InitializeComponent();
     }
 
-    async void Run()
-	{ 
-
-        foreach (var obj in await App.DataBase.GetObjectsAsync())
-        {
-            if (obj.Status == 0)
-            {
-                var task = await App.DataBase.GetTaskAsync(obj.TaskId);
-                bool answer = await DisplayAlert($"{task.Name}", $"Виконано {task.Name}", "Так", "Ні");
-                if (answer)
-                {
-                    obj.Status = 1;
-                    await App.DataBase.UpdateObjectAsync(obj);
-                }
-            }
-        }
-    }
-
-    private void run_Clicked(object sender, EventArgs e)
-    {
-        Run();
-    }
-
     private async void addTask_Clicked(object sender, EventArgs e)
     {
         try

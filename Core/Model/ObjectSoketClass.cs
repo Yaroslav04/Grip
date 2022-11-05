@@ -17,6 +17,8 @@ namespace Grip.Core.Model
             this.PeriodId = objectClass.PeriodId;
             this.NotificationTime = objectClass.NotificationTime;
             this.Status = objectClass.Status;
+
+            this.SaveDate = objectClass.SaveDate;
             TaskSoket = taskSoket;
             PeriodSoket = periodSoket;
         }

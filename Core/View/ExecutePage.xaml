@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Grip.Core.View.ExecutePage"
+             xmlns:model="clr-namespace:Grip.Core.Model"
+             xmlns:viewmodel="clr-namespace:Grip.Core.ViewModel"
+             xmlns:converter="clr-namespace:Grip.Core.Services.Converter"
+             x:DataType="viewmodel:ExecuteViewModel"
+             Title="ExecutePage">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converter:ObjectStatusConverter x:Key="status" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <RefreshView Padding="2,2,2,2" Margin="2,2,2,2" Command="{Binding LoadItemsCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+        <CollectionView x:Name="ItemsListView"
+            ItemsSource="{Binding Items}"
+            SelectionMode="None"
+            HorizontalOptions="FillAndExpand">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <ContentView>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Frame Grid.Row="0" x:DataType="model:ObjectSoketClass">
+                                <!--Body-->
+                                <StackLayout x:DataType="model:ObjectSoketClass">
+                                    <Label FontSize="13" TextColor="{StaticResource Black}" Text="{Binding TaskSoket.Type}"></Label>
+                                    <Label FontSize="20" TextColor="{StaticResource Black}" FontAttributes="Bold" Text="{Binding TaskSoket.Name}"></Label>
+                                    <Label FontSize="18" TextColor="{StaticResource Black}" FontAttributes="Bold" Text="{Binding NotificationTime, StringFormat='{0:hh}:{0:mm}'}"></Label>
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label FontSize="15" TextColor="{StaticResource Gray400}" Text="{Binding PeriodSoket.StartTime, StringFormat='{0:hh}:{0:mm}'}"></Label>
+                                        <Label FontSize="15" TextColor="{StaticResource Gray400}" Text=" - "></Label>
+                                        <Label FontSize="15" TextColor="{StaticResource Gray400}" Text="{Binding PeriodSoket.StopTime, StringFormat='{0:hh}:{0:mm}'}"></Label>
+                                    </HorizontalStackLayout>
+                                    <Label FontSize="18" TextColor="{StaticResource Gray400}" Text="{Binding SaveDate, StringFormat='{0:dd}.{0:MM}.{0:yyyy}'}"></Label>
+                                    <Label FontSize="18" TextColor="{StaticResource Gray600}" Text="{Binding Status, Converter={StaticResource status}}"></Label>
+                                </StackLayout>
+                                <!--Body-->                           
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                NumberOfTapsRequired="2"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:ExecuteViewModel}}, Path=ItemTapped}"		
+                                CommandParameter="{Binding .}">
+                                    </TapGestureRecognizer>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                        </Grid>
+                    </ContentView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+</ContentPage>
