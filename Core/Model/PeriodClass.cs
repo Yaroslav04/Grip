@@ -15,6 +15,8 @@ namespace Grip.Core.Model
         public TimeSpan StopTime { get; set; }
         public int Pause { get; set; }
         public bool IsActive { get; set; }
+        public bool IsNotify { get; set; }
+        public bool IsVisible { get; set; }
         public DateTime SaveDate { get; set; }
 
     }

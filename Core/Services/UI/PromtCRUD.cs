@@ -102,7 +102,7 @@ namespace Grip.Core.Services.UI
                 return null;
             }
 
-            string _endDate = await Shell.Current.DisplayPromptAsync(title, $"EndDate", initialValue: DateTime.Now.ToShortDateString());
+            string _endDate = await Shell.Current.DisplayPromptAsync(title, $"EndDate", initialValue: DateTime.MaxValue.ToShortDateString());
             if (String.IsNullOrWhiteSpace(_endDate) | _endDate == "Cancel")
             {
                 return null;
@@ -136,6 +136,8 @@ namespace Grip.Core.Services.UI
                 StopTime = TimeSpan.Parse(_stopTime),
                 Pause = Convert.ToInt32(_pause),
                 IsActive = true,
+                IsNotify = true,
+                IsVisible = true,
                 SaveDate = DateTime.Now
             };
         }

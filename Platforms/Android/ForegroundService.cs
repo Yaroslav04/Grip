@@ -55,7 +55,7 @@ namespace Grip.Platforms.Android
                     {
                         FileManager.WriteLog("foreground exception", ex.Message);
                     }
-                                    
+
                     //**********Message              
                 }
             });
@@ -63,9 +63,9 @@ namespace Grip.Platforms.Android
             string channelID = "ForeGroundServiceChannel";
             var notificationManager = (NotificationManager)GetSystemService(NotificationService);
 
-                var notfificationChannel = new NotificationChannel(channelID, channelID, NotificationImportance.Low);
-                notificationManager.CreateNotificationChannel(notfificationChannel);
-            
+            var notfificationChannel = new NotificationChannel(channelID, channelID, NotificationImportance.Low);
+            notificationManager.CreateNotificationChannel(notfificationChannel);
+
 
             var notificationBuilder = new NotificationCompat.Builder(this, channelID)
                                          .SetContentTitle("Grip ServiceStarted")
@@ -116,8 +116,8 @@ namespace Grip.Platforms.Android
             string channelID = "NotificationChannel";
             var SnotificationManager = (NotificationManager)GetSystemService(NotificationService);
 
-                var notfificationChannel = new NotificationChannel(channelID, channelID, NotificationImportance.High);
-                SnotificationManager.CreateNotificationChannel(notfificationChannel);
+            var notfificationChannel = new NotificationChannel(channelID, channelID, NotificationImportance.High);
+            SnotificationManager.CreateNotificationChannel(notfificationChannel);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelID)
             .SetContentTitle("Notification")
