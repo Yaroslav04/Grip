@@ -89,6 +89,13 @@ namespace Grip.Core.Services.UI
             var tKeyPair = taskDict.Where(x => x.Value == _task).FirstOrDefault();
             int taskId = tKeyPair.Key;
 
+
+            string _period = await Shell.Current.DisplayActionSheet("Выбор периода", "Cancel", null, App.PeriodTypes.ToArray());
+            if (String.IsNullOrWhiteSpace(_period) | _period == "Cancel")
+            {
+                return null;
+            }
+
             string _startDate = await Shell.Current.DisplayPromptAsync(title, $"StartDate", initialValue: DateTime.Now.ToShortDateString());
             if (String.IsNullOrWhiteSpace(_startDate) | _startDate == "Cancel")
             {
@@ -99,13 +106,7 @@ namespace Grip.Core.Services.UI
             if (String.IsNullOrWhiteSpace(_endDate) | _endDate == "Cancel")
             {
                 return null;
-            }
-
-            string _period = await Shell.Current.DisplayPromptAsync(title, $"Period");
-            if (String.IsNullOrWhiteSpace(_period) | _period == "Cancel")
-            {
-                return null;
-            }
+            }      
 
             string _startTime = await Shell.Current.DisplayPromptAsync(title, $"StartTime");
             if (String.IsNullOrWhiteSpace(_startTime) | _startTime == "Cancel")
@@ -130,7 +131,7 @@ namespace Grip.Core.Services.UI
                 Id = taskId,
                 StartDate = Convert.ToDateTime(_startDate),
                 EndDate = Convert.ToDateTime(_endDate),
-                Period = Convert.ToInt32(_period),
+                Period = PeriodParser.GetIntFromPeriodName(_period),
                 StartTime = TimeSpan.Parse(_startTime),
                 StopTime = TimeSpan.Parse(_stopTime),
                 Pause = Convert.ToInt32(_pause),

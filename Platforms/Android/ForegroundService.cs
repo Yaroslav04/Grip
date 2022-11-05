@@ -33,15 +33,16 @@ namespace Grip.Platforms.Android
                 while (IsForegroundServiceRunning)
                 {
                     Thread.Sleep(60000);
-
                     //**********Message
 
                     try
                     {
+                        FileManager.WriteLog("iteration", "before agreagition");
                         var s = await Task.Run(() => DataAgregator.Run());
 
                         if (s.Count > 0)
                         {
+                            FileManager.WriteLog("iteration", "after agreagition");
                             string message = "";
                             foreach (var item in s)
                             {
@@ -52,7 +53,7 @@ namespace Grip.Platforms.Android
                     }
                     catch (Exception ex)
                     {
-                        FileManager.WriteLog("foreground servise", ex.Message);
+                        FileManager.WriteLog("foreground exception", ex.Message);
                     }
                                     
                     //**********Message              
@@ -84,11 +85,13 @@ namespace Grip.Platforms.Android
         {
             base.OnCreate();
             IsForegroundServiceRunning = true;
+            FileManager.WriteLog("foreground servise", "on create");
         }
         public override void OnDestroy()
         {
             base.OnDestroy();
             IsForegroundServiceRunning = false;
+            FileManager.WriteLog("foreground servise", "on destroy");
         }
 
         public void StartMyForegroundService()
