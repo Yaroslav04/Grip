@@ -33,16 +33,15 @@ namespace Grip.Platforms.Android
                 while (IsForegroundServiceRunning)
                 {
                     Thread.Sleep(60000);
+
                     //**********Message
 
                     try
                     {
-                        FileManager.WriteLog("iteration", "before agreagition");
                         var s = await Task.Run(() => DataAgregator.Run());
 
                         if (s.Count > 0)
                         {
-                            FileManager.WriteLog("iteration", "after agreagition");
                             string message = "";
                             foreach (var item in s)
                             {

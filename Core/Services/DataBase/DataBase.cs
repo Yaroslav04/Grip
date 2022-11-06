@@ -182,14 +182,14 @@ namespace Grip.Core.Services.DataBase
         {
             return await objectDataBase.Table<ObjectClass>()
                 .Where(x => x.TaskId == _taskId & x.PeriodId == _periodId
-                & DateTime.Now.DayOfYear == _day).FirstOrDefaultAsync();
+                & x.Day == _day).FirstOrDefaultAsync();
         }
 
         public async Task<bool> IsObjectExistAsync(int _taskId, int _periodId, int _day)
         {
             var s = await objectDataBase.Table<ObjectClass>()
                 .Where(x => x.TaskId  == _taskId & x.PeriodId == _periodId 
-                & DateTime.Now.DayOfYear == _day).ToListAsync();
+                & x.Day == _day).ToListAsync();
 
             if (s.Count > 0)
             {

@@ -43,14 +43,11 @@ namespace Grip.Core.Services.DataBase
                         {
                             if (DateTime.Now.TimeOfDay > period.StartTime)
                             {
-                                //проверяем есть ли такой обьект
                                 if (await App.DataBase.IsObjectExistAsync(task.N, period.N, DateTime.Now.DayOfYear))
                                 {
                                     ObjectClass obj = await App.DataBase.GetObjectAsync(task.N, period.N, DateTime.Now.DayOfYear);
-                                    //проверяем статус обджекта
                                     if (obj.Status == 0)
-                                    {
-                                        // проверяем не вылезло ли время сейчас за стоп тайм                                 
+                                    {                               
                                         if (DateTime.Now.TimeOfDay > period.StopTime)
                                         {
                                             try
@@ -66,7 +63,6 @@ namespace Grip.Core.Services.DataBase
                                         }
                                         else
                                         {
-                                            //проверяем больше ли времени на счетчике со временем сейчас
                                             if (DateTime.Now.TimeOfDay > obj.NotificationTime)
                                             {
                                                 var t = DateTime.Now.TimeOfDay + TimeSpan.FromMinutes(period.Pause);
@@ -99,8 +95,8 @@ namespace Grip.Core.Services.DataBase
                                         }
                                     }
                                 }
-                                else
-                                {
+                                else 
+                                {                                   
                                     ObjectClass objectClass = new ObjectClass();
                                     objectClass.TaskId = task.N;
                                     objectClass.PeriodId = period.N;
@@ -108,6 +104,14 @@ namespace Grip.Core.Services.DataBase
                                     objectClass.Status = 0;
                                     objectClass.Day = DateTime.Now.DayOfYear;
                                     objectClass.SaveDate = DateTime.Now;
+                                    try
+                                    {
+
+                                    }
+                                    catch(Exception s)
+                                    {
+                                        Debug.WriteLine(s.Message);
+                                    }
                                     await App.DataBase.SaveObjectAsync(objectClass);
 
                                     ObjectClass obj = await App.DataBase.GetObjectAsync(task.N, period.N, DateTime.Now.DayOfYear);
