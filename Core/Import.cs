@@ -12,6 +12,8 @@ global using Grip.Core.Services;
 global using Grip.Core.Notification;
 global using Grip.Core.View;
 global using Grip.Core.ViewModel;
+global using Grip.Core.Services.Converter;
+global using Grip.Core.Services.UI;
 
 
 

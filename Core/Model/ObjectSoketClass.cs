@@ -15,6 +15,7 @@ namespace Grip.Core.Model
             this.N = objectClass.N;
             this.TaskId = objectClass.TaskId;
             this.PeriodId = objectClass.PeriodId;
+            this.Descripton = objectClass.Descripton;
             this.NotificationTime = objectClass.NotificationTime;
             this.Status = objectClass.Status;
             this.Day = objectClass.Day;

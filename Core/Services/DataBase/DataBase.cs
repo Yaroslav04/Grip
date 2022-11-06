@@ -72,6 +72,11 @@ namespace Grip.Core.Services.DataBase
             return await taskDataBase.Table<TaskClass>().Where(x => x.N == _id).FirstOrDefaultAsync();
         }
 
+        public async Task<List<TaskClass>> GetTasksAsync(string _type)
+        {
+            return await taskDataBase.Table<TaskClass>().Where(x => x.Type == _type).ToListAsync();
+        }
+
 
         #endregion
 
@@ -118,14 +123,19 @@ namespace Grip.Core.Services.DataBase
             return await periodDataBase.Table<PeriodClass>().ToListAsync();
         }
 
-        public async Task<List<PeriodClass>> GetPeriodsAsync(int _id)
-        {
-            return await periodDataBase.Table<PeriodClass>().Where(x => x.Id == _id).ToListAsync();
-        }
-
         public async Task<PeriodClass> GetPeriodAsync(int _id)
         {
             return await periodDataBase.Table<PeriodClass>().Where(x => x.N == _id).FirstOrDefaultAsync();
+        }
+
+        public async Task<PeriodClass> GetPeriodAsync(PeriodClass periodClass)
+        {
+            return await periodDataBase.Table<PeriodClass>().Where(x => x.SaveDate == periodClass.SaveDate & x.Id == periodClass.Id).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<PeriodClass>> GetPeriodsAsync(int _id)
+        {
+            return await periodDataBase.Table<PeriodClass>().Where(x => x.Id == _id).ToListAsync();
         }
 
         #endregion
@@ -187,18 +197,18 @@ namespace Grip.Core.Services.DataBase
 
         public async Task<bool> IsObjectExistAsync(int _taskId, int _periodId, int _day)
         {
-            var s = await objectDataBase.Table<ObjectClass>()
-                .Where(x => x.TaskId  == _taskId & x.PeriodId == _periodId 
+                var s = await objectDataBase.Table<ObjectClass>()
+                .Where(x => x.TaskId == _taskId & x.PeriodId == _periodId
                 & x.Day == _day).ToListAsync();
 
-            if (s.Count > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+                if (s.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }                  
         }
 
         #endregion

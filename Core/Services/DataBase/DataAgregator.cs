@@ -17,11 +17,23 @@ namespace Grip.Core.Services.DataBase
             {
                 foreach (var obj in await App.DataBase.GetObjectsAsync())
                 {
-                    if (obj.Day < DateTime.Now.DayOfYear)
+                    var per = await App.DataBase.GetPeriodAsync(obj.TaskId);
+                    if (per.IsAutoDayEnd)
+                    {
+                        if (obj.Day < DateTime.Now.DayOfYear)
+                        {
+                            if (obj.Status == 0)
+                            {
+                                obj.Status = 2;
+                                await App.DataBase.UpdateObjectAsync(obj);
+                            }
+                        }
+                    }
+                    else
                     {
                         if (obj.Status == 0)
                         {
-                            obj.Status = 2;
+                            obj.Day = DateTime.Now.DayOfYear;
                             await App.DataBase.UpdateObjectAsync(obj);
                         }
                     }
@@ -39,15 +51,85 @@ namespace Grip.Core.Services.DataBase
                 {
                     foreach (var period in periods)
                     {
-                        if (PeriodParser.IsPeriod(period))
+                        if (period.Period != 0)
                         {
-                            if (DateTime.Now.TimeOfDay > period.StartTime)
+                            if (PeriodParser.IsPeriod(period))
                             {
-                                if (await App.DataBase.IsObjectExistAsync(task.N, period.N, DateTime.Now.DayOfYear))
+                                if (DateTime.Now.TimeOfDay > period.StartTime)
                                 {
-                                    ObjectClass obj = await App.DataBase.GetObjectAsync(task.N, period.N, DateTime.Now.DayOfYear);
-                                    if (obj.Status == 0)
-                                    {                               
+                                    if (await App.DataBase.IsObjectExistAsync(task.N, period.N, DateTime.Now.DayOfYear))
+                                    {
+                                        ObjectClass obj = await App.DataBase.GetObjectAsync(task.N, period.N, DateTime.Now.DayOfYear);
+                                        if (obj.Status == 0)
+                                        {
+                                            if (DateTime.Now.TimeOfDay > period.StopTime)
+                                            {
+                                                try
+                                                {
+                                                    obj.Status = 2;
+                                                    await App.DataBase.UpdateObjectAsync(obj);
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    FileManager.WriteLog("agregator:execute time lost", ex.Message);
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                if (DateTime.Now.TimeOfDay > obj.NotificationTime)
+                                                {
+                                                    var t = DateTime.Now.TimeOfDay + TimeSpan.FromMinutes(period.Pause);
+                                                    if (t > period.StopTime)
+                                                    {
+                                                        try
+                                                        {
+                                                            obj.Status = 2;
+                                                            await App.DataBase.UpdateObjectAsync(obj);
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+                                                            FileManager.WriteLog("agregator:execute time lost", ex.Message);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        try
+                                                        {
+                                                            obj.NotificationTime = t;
+                                                            await App.DataBase.UpdateObjectAsync(obj);
+                                                            result.Add(new ObjectSoketClass(obj, task, period));
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+                                                            FileManager.WriteLog("agregator:update notification time", ex.Message);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ObjectClass objectClass = new ObjectClass();
+                                        objectClass.TaskId = task.N;
+                                        objectClass.PeriodId = period.N;
+                                        objectClass.NotificationTime = period.StartTime;
+                                        objectClass.Status = 0;
+                                        objectClass.Day = DateTime.Now.DayOfYear;
+                                        objectClass.SaveDate = DateTime.Now;
+                                        try
+                                        {
+
+                                        }
+                                        catch (Exception s)
+                                        {
+                                            Debug.WriteLine(s.Message);
+                                        }
+                                        await App.DataBase.SaveObjectAsync(objectClass);
+
+                                        ObjectClass obj = await App.DataBase.GetObjectAsync(task.N, period.N, DateTime.Now.DayOfYear);
+
                                         if (DateTime.Now.TimeOfDay > period.StopTime)
                                         {
                                             try
@@ -57,12 +139,12 @@ namespace Grip.Core.Services.DataBase
                                             }
                                             catch (Exception ex)
                                             {
-                                                FileManager.WriteLog("agregator:execute time lost", ex.Message);
+                                                FileManager.WriteLog("agregator:execute time lost when create object", ex.Message);
                                             }
-
                                         }
                                         else
                                         {
+                                            //проверяем больше ли времени на счетчике со временем сейчас
                                             if (DateTime.Now.TimeOfDay > obj.NotificationTime)
                                             {
                                                 var t = DateTime.Now.TimeOfDay + TimeSpan.FromMinutes(period.Pause);
@@ -75,7 +157,7 @@ namespace Grip.Core.Services.DataBase
                                                     }
                                                     catch (Exception ex)
                                                     {
-                                                        FileManager.WriteLog("agregator:execute time lost", ex.Message);
+                                                        FileManager.WriteLog("agregator:execute time lost when create object", ex.Message);
                                                     }
                                                 }
                                                 else
@@ -88,75 +170,8 @@ namespace Grip.Core.Services.DataBase
                                                     }
                                                     catch (Exception ex)
                                                     {
-                                                        FileManager.WriteLog("agregator:update notification time", ex.Message);
+                                                        FileManager.WriteLog("agregator:create object", ex.Message);
                                                     }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                else 
-                                {                                   
-                                    ObjectClass objectClass = new ObjectClass();
-                                    objectClass.TaskId = task.N;
-                                    objectClass.PeriodId = period.N;
-                                    objectClass.NotificationTime = period.StartTime;
-                                    objectClass.Status = 0;
-                                    objectClass.Day = DateTime.Now.DayOfYear;
-                                    objectClass.SaveDate = DateTime.Now;
-                                    try
-                                    {
-
-                                    }
-                                    catch(Exception s)
-                                    {
-                                        Debug.WriteLine(s.Message);
-                                    }
-                                    await App.DataBase.SaveObjectAsync(objectClass);
-
-                                    ObjectClass obj = await App.DataBase.GetObjectAsync(task.N, period.N, DateTime.Now.DayOfYear);
-
-                                    if (DateTime.Now.TimeOfDay > period.StopTime)
-                                    {
-                                        try
-                                        {
-                                            obj.Status = 2;
-                                            await App.DataBase.UpdateObjectAsync(obj);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            FileManager.WriteLog("agregator:execute time lost when create object", ex.Message);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        //проверяем больше ли времени на счетчике со временем сейчас
-                                        if (DateTime.Now.TimeOfDay > obj.NotificationTime)
-                                        {
-                                            var t = DateTime.Now.TimeOfDay + TimeSpan.FromMinutes(period.Pause);
-                                            if (t > period.StopTime)
-                                            {
-                                                try
-                                                {
-                                                    obj.Status = 2;
-                                                    await App.DataBase.UpdateObjectAsync(obj);
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    FileManager.WriteLog("agregator:execute time lost when create object", ex.Message);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                try
-                                                {
-                                                    obj.NotificationTime = t;
-                                                    await App.DataBase.UpdateObjectAsync(obj);
-                                                    result.Add(new ObjectSoketClass(obj, task, period));
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    FileManager.WriteLog("agregator:create object", ex.Message);
                                                 }
                                             }
                                         }

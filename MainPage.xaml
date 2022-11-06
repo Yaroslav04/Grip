@@ -8,6 +8,7 @@
         <Button HeightRequest="50" Padding="2,2,2,2" x:Name="stopServise" Text="StopServise" Clicked="stopServise_Clicked"></Button>
         <Button HeightRequest="50" Padding="2,2,2,2" x:Name="addTask" Text="AddTask" Clicked="addTask_Clicked"></Button>
         <Button HeightRequest="50" Padding="2,2,2,2" x:Name="addPeriod" Text="AddPeriod" Clicked="addPeriod_Clicked"></Button>
+        <Button HeightRequest="50" Padding="2,2,2,2" x:Name="addObject" Text="AddObject" Clicked="addObject_Clicked"></Button>
     </StackLayout>
 
 </ContentPage>

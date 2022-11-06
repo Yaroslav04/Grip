@@ -11,6 +11,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converter:ObjectStatusConverter x:Key="status" />
+            <converter:PeriodConverter x:Key="period" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -36,9 +37,12 @@
                                         <Label FontSize="15" TextColor="{StaticResource Gray400}" Text="{Binding PeriodSoket.StartTime, StringFormat='{0:hh}:{0:mm}'}"></Label>
                                         <Label FontSize="15" TextColor="{StaticResource Gray400}" Text=" - "></Label>
                                         <Label FontSize="15" TextColor="{StaticResource Gray400}" Text="{Binding PeriodSoket.StopTime, StringFormat='{0:hh}:{0:mm}'}"></Label>
+                                        <Label FontSize="15" TextColor="{StaticResource Gray400}" Text=":"></Label>
+                                        <Label FontSize="15" TextColor="{StaticResource Gray400}" Text="{Binding PeriodSoket.Period, Converter={StaticResource period}}"></Label>
                                     </HorizontalStackLayout>
                                     <Label FontSize="18" TextColor="{StaticResource Gray400}" Text="{Binding SaveDate, StringFormat='{0:dd}.{0:MM}.{0:yyyy}'}"></Label>
                                     <Label FontSize="18" TextColor="{StaticResource Gray600}" Text="{Binding Status, Converter={StaticResource status}}"></Label>
+                                    <Label FontSize="15" TextColor="{StaticResource Gray400}" Text="{Binding Descripton}"></Label>
                                 </StackLayout>
                                 <!--Body-->                           
                                 <Frame.GestureRecognizers>
