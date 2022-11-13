@@ -1,6 +1,4 @@
-﻿using Android.OS;
-using Grip.Platforms.Android;
-
+﻿
 namespace Grip;
 
 public static class MauiProgram

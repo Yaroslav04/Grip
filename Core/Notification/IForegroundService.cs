@@ -11,6 +11,6 @@ namespace Grip.Core.Notification
         void StartMyForegroundService();
         void StopMyForegroundService();
         bool IsForeGroundServiceRunning();
-        void SendNotification(string message);
+        void SendNotification(int _id, string _title, string _message);
     }
 }

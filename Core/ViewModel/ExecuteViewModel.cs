@@ -1,13 +1,9 @@
-﻿using AndroidX.AppCompat.View.Menu;
-
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Android.Icu.Text.CaseMap;
 
 namespace Grip.Core.ViewModel
 {
@@ -37,10 +33,10 @@ namespace Grip.Core.ViewModel
             try
             {
                 List<ObjectSoketClass> list = new List<ObjectSoketClass>();
-                foreach(var obj in await App.DataBase.GetObjectsAsync())
+                foreach(var obj in await App.DataBase.ObjectDB.GetObjectsAsync())
                 {
-                    TaskClass taskClass = await App.DataBase.GetTaskAsync(obj.TaskId);
-                    PeriodClass periodClass = await App.DataBase.GetPeriodAsync(obj.PeriodId);
+                    TaskClass taskClass = await App.DataBase.TaskDB.GetTaskAsync(obj.TaskId);
+                    PeriodClass periodClass = await App.DataBase.PeriodDB.GetPeriodAsync(obj.PeriodId);
                     ObjectSoketClass objectSoketClass = new ObjectSoketClass(obj, taskClass,periodClass);
                     list.Add(objectSoketClass);
                 }
@@ -72,12 +68,12 @@ namespace Grip.Core.ViewModel
         }
         async void Tapped(ObjectSoketClass item)
         {
+         
             if (item == null)
                 return;
 
             string _choise = await Shell.Current.DisplayActionSheet("Выберите действие", "Cancel", null, 
-                new string[] {"Смена статуса обьекта", "Клонировать обьект", "Удалить обьект",
-                    "Редактировать задачу", "Удалить задачу"});
+                new string[] {"Смена статуса обьекта", "Клонировать обьект", "Удалить обьект"});
             if (String.IsNullOrWhiteSpace(_choise) | _choise == "Cancel")
             {
                 return;
@@ -87,37 +83,37 @@ namespace Grip.Core.ViewModel
             {
                 if (item.Status == 0)
                 {
-                    var task = await App.DataBase.GetTaskAsync(item.TaskId);
+                    var task = await App.DataBase.TaskDB.GetTaskAsync(item.TaskId);
                     bool answer = await Shell.Current.DisplayAlert($"{task.Name}", $"Виконано {task.Name}?", "Так", "Ні");
                     if (answer)
                     {
-                        ObjectClass obj = await App.DataBase.GetObjectAsync(item.N);
+                        ObjectClass obj = await App.DataBase.ObjectDB.GetObjectAsync(item.N);
                         obj.Status = 1;
-                        await App.DataBase.UpdateObjectAsync(obj);
+                        await App.DataBase.ObjectDB.UpdateAsync(obj);
                     }
                 }
 
                 if (item.Status == 1)
                 {
-                    var task = await App.DataBase.GetTaskAsync(item.TaskId);
+                    var task = await App.DataBase.TaskDB.GetTaskAsync(item.TaskId);
                     bool answer = await Shell.Current.DisplayAlert($"{task.Name}", $"Не виконано {task.Name}?", "Так", "Ні");
                     if (answer)
                     {
-                        ObjectClass obj = await App.DataBase.GetObjectAsync(item.N);
+                        ObjectClass obj = await App.DataBase.ObjectDB.GetObjectAsync(item.N);
                         obj.Status = 2;
-                        await App.DataBase.UpdateObjectAsync(obj);
+                        await App.DataBase.ObjectDB.UpdateAsync(obj);
                     }
                 }
 
                 if (item.Status == 2)
                 {
-                    var task = await App.DataBase.GetTaskAsync(item.TaskId);
+                    var task = await App.DataBase.TaskDB.GetTaskAsync(item.TaskId);
                     bool answer = await Shell.Current.DisplayAlert($"{task.Name}", $"Виконано {task.Name}?", "Так", "Ні");
                     if (answer)
                     {
-                        ObjectClass obj = await App.DataBase.GetObjectAsync(item.N);
+                        ObjectClass obj = await App.DataBase.ObjectDB.GetObjectAsync(item.N);
                         obj.Status = 1;
-                        await App.DataBase.UpdateObjectAsync(obj);
+                        await App.DataBase.ObjectDB.UpdateAsync(obj);
                     }
                 }
             }
@@ -137,14 +133,14 @@ namespace Grip.Core.ViewModel
 
                     PeriodClass periodClass = PromtCRUD.GetEmptyPeriod(obj.TaskId);
 
-                    await App.DataBase.SavePeriodAsync(periodClass);
+                    await App.DataBase.PeriodDB.SaveAsync(periodClass);
 
-                    var periodId = await App.DataBase.GetPeriodAsync(periodClass);
+                    var periodId = await App.DataBase.PeriodDB.GetPeriodAsync(periodClass);
                     obj.PeriodId = periodId.N;
 
                     try
                     {
-                        await App.DataBase.SaveObjectAsync(obj);
+                        await App.DataBase.ObjectDB.SaveAsync(obj);
                         await Shell.Current.DisplayAlert($"Клонирование", $"Сохранено", "ОК");
                     }
                     catch(Exception ex)
@@ -161,7 +157,7 @@ namespace Grip.Core.ViewModel
                 {
                     try
                     {
-                        await App.DataBase.DeleteObjectAsync(ClassConverter.ConvertObjectSoketClassToObjectClass(item));
+                        await App.DataBase.ObjectDB.DeleteAsync(ClassConverter.ConvertObjectSoketClassToObjectClass(item));
                         await Shell.Current.DisplayAlert($"Удаление", $"Удалено", "ОК");
                     }
                     catch (Exception ex)
@@ -178,7 +174,7 @@ namespace Grip.Core.ViewModel
                 {
                     try
                     {
-                        await App.DataBase.UpdateTaskAsync(await PromtCRUD.UpdateTask(item.TaskSoket));
+                        await App.DataBase.TaskDB.UpdateAsync(await PromtCRUD.UpdateTask(item.TaskSoket));
                         await Shell.Current.DisplayAlert($"Редактирование", $"Сохранено", "ОК");
                     }
                     catch (Exception ex)
@@ -195,7 +191,7 @@ namespace Grip.Core.ViewModel
                 {
                     try
                     {
-                        await App.DataBase.DeleteTaskAsync(item.TaskSoket);
+                        await App.DataBase.TaskDB.DeleteAsync(item.TaskSoket);
                         await Shell.Current.DisplayAlert($"Удаление", $"Удалено", "ОК");
                     }
                     catch (Exception ex)

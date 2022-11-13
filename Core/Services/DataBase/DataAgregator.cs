@@ -15,9 +15,9 @@ namespace Grip.Core.Services.DataBase
 
             try
             {
-                foreach (var obj in await App.DataBase.GetObjectsAsync())
+                foreach (var obj in await App.DataBase.ObjectDB.GetObjectsAsync())
                 {
-                    var per = await App.DataBase.GetPeriodAsync(obj.TaskId);
+                    var per = await App.DataBase.PeriodDB.GetPeriodAsync(obj.TaskId);
                     if (per.IsAutoDayEnd)
                     {
                         if (obj.Day < DateTime.Now.DayOfYear)
@@ -25,7 +25,7 @@ namespace Grip.Core.Services.DataBase
                             if (obj.Status == 0)
                             {
                                 obj.Status = 2;
-                                await App.DataBase.UpdateObjectAsync(obj);
+                                await App.DataBase.ObjectDB.UpdateAsync(obj);
                             }
                         }
                     }
@@ -34,7 +34,7 @@ namespace Grip.Core.Services.DataBase
                         if (obj.Status == 0)
                         {
                             obj.Day = DateTime.Now.DayOfYear;
-                            await App.DataBase.UpdateObjectAsync(obj);
+                            await App.DataBase.ObjectDB.UpdateAsync(obj);
                         }
                     }
                 }
@@ -44,9 +44,9 @@ namespace Grip.Core.Services.DataBase
                 FileManager.WriteLog("agregator:last day update", ex.Message);
             }
 
-            foreach (var task in await App.DataBase.GetTasksAsync())
+            foreach (var task in await App.DataBase.TaskDB.GetTasksAsync())
             {
-                var periods = await App.DataBase.GetPeriodsAsync(task.N);
+                var periods = await App.DataBase.PeriodDB.GetPeriodsAsync(task.N);
                 if (periods != null)
                 {
                     foreach (var period in periods)
@@ -57,9 +57,9 @@ namespace Grip.Core.Services.DataBase
                             {
                                 if (DateTime.Now.TimeOfDay > period.StartTime)
                                 {
-                                    if (await App.DataBase.IsObjectExistAsync(task.N, period.N, DateTime.Now.DayOfYear))
+                                    if (await App.DataBase.ObjectDB.IsObjectExistAsync(task.N, period.N, DateTime.Now.DayOfYear))
                                     {
-                                        ObjectClass obj = await App.DataBase.GetObjectAsync(task.N, period.N, DateTime.Now.DayOfYear);
+                                        ObjectClass obj = await App.DataBase.ObjectDB.GetObjectAsync(task.N, period.N, DateTime.Now.DayOfYear);
                                         if (obj.Status == 0)
                                         {
                                             if (DateTime.Now.TimeOfDay > period.StopTime)
@@ -67,7 +67,7 @@ namespace Grip.Core.Services.DataBase
                                                 try
                                                 {
                                                     obj.Status = 2;
-                                                    await App.DataBase.UpdateObjectAsync(obj);
+                                                    await App.DataBase.ObjectDB.UpdateAsync(obj);
                                                 }
                                                 catch (Exception ex)
                                                 {
@@ -85,7 +85,7 @@ namespace Grip.Core.Services.DataBase
                                                         try
                                                         {
                                                             obj.Status = 2;
-                                                            await App.DataBase.UpdateObjectAsync(obj);
+                                                            await App.DataBase.ObjectDB.UpdateAsync(obj);
                                                         }
                                                         catch (Exception ex)
                                                         {
@@ -97,7 +97,7 @@ namespace Grip.Core.Services.DataBase
                                                         try
                                                         {
                                                             obj.NotificationTime = t;
-                                                            await App.DataBase.UpdateObjectAsync(obj);
+                                                            await App.DataBase.ObjectDB.UpdateAsync(obj);
                                                             result.Add(new ObjectSoketClass(obj, task, period));
                                                         }
                                                         catch (Exception ex)
@@ -126,16 +126,16 @@ namespace Grip.Core.Services.DataBase
                                         {
                                             Debug.WriteLine(s.Message);
                                         }
-                                        await App.DataBase.SaveObjectAsync(objectClass);
+                                        await App.DataBase.ObjectDB.SaveAsync(objectClass);
 
-                                        ObjectClass obj = await App.DataBase.GetObjectAsync(task.N, period.N, DateTime.Now.DayOfYear);
+                                        ObjectClass obj = await App.DataBase.ObjectDB.GetObjectAsync(task.N, period.N, DateTime.Now.DayOfYear);
 
                                         if (DateTime.Now.TimeOfDay > period.StopTime)
                                         {
                                             try
                                             {
                                                 obj.Status = 2;
-                                                await App.DataBase.UpdateObjectAsync(obj);
+                                                await App.DataBase.ObjectDB.UpdateAsync(obj);
                                             }
                                             catch (Exception ex)
                                             {
@@ -153,7 +153,7 @@ namespace Grip.Core.Services.DataBase
                                                     try
                                                     {
                                                         obj.Status = 2;
-                                                        await App.DataBase.UpdateObjectAsync(obj);
+                                                        await App.DataBase.ObjectDB.UpdateAsync(obj);
                                                     }
                                                     catch (Exception ex)
                                                     {
@@ -165,7 +165,7 @@ namespace Grip.Core.Services.DataBase
                                                     try
                                                     {
                                                         obj.NotificationTime = t;
-                                                        await App.DataBase.UpdateObjectAsync(obj);
+                                                        await App.DataBase.ObjectDB.UpdateAsync(obj);
                                                         result.Add(new ObjectSoketClass(obj, task, period));
                                                     }
                                                     catch (Exception ex)

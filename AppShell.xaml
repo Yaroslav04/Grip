@@ -13,6 +13,11 @@
         Route="ExecutePage" />
 
     <ShellContent
+        Title="Task"
+        ContentTemplate="{DataTemplate view:TaskPage}"
+        Route="TaskPage" />
+
+    <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />

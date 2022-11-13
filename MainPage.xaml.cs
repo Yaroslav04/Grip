@@ -21,7 +21,7 @@ public partial class MainPage : ContentPage
                 throw new Exception("Ошибка promt");
             }
 
-            await App.DataBase.SaveTaskAsync(task);
+            await App.DataBase.TaskDB.SaveAsync(task);
             await Shell.Current.DisplayAlert($"Добавить task", $"Сохранено", "ОК");
         }
         catch (Exception ex)
@@ -41,7 +41,7 @@ public partial class MainPage : ContentPage
                 throw new Exception("Ошибка promt");
             }
 
-            await App.DataBase.SavePeriodAsync(period);
+            await App.DataBase.PeriodDB.SaveAsync(period);
             await Shell.Current.DisplayAlert($"Добавить period", $"Сохранено", "ОК");
         }
         catch (Exception ex)
@@ -82,7 +82,7 @@ public partial class MainPage : ContentPage
             return;
         }
 
-        var tasks = await App.DataBase.GetTasksAsync(_type);
+        var tasks = await App.DataBase.TaskDB.GetTasksAsync(_type);
         if (tasks.Count == 0)
         {
             return;
@@ -114,13 +114,13 @@ public partial class MainPage : ContentPage
 
         PeriodClass periodClass = PromtCRUD.GetEmptyPeriod(taskId);
 
-        await App.DataBase.SavePeriodAsync(periodClass);
+        await App.DataBase.PeriodDB.SaveAsync(periodClass);
 
-        var periodId = await App.DataBase.GetPeriodAsync(periodClass);
+        var periodId = await App.DataBase.PeriodDB.GetPeriodAsync(periodClass);
 
         try
         {
-            await App.DataBase.SaveObjectAsync(
+            await App.DataBase.ObjectDB.SaveAsync(
             new ObjectClass
             {
                 TaskId = taskId,
@@ -137,7 +137,7 @@ public partial class MainPage : ContentPage
         {
             try
             {
-                await App.DataBase.DeletePeriodAsync(periodId);
+                await App.DataBase.PeriodDB.DeleteAsync(periodId);
             }
             catch
             {

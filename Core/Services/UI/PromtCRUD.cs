@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Android.Content.ClipData;
 
 namespace Grip.Core.Services.UI
 {
@@ -64,7 +63,7 @@ namespace Grip.Core.Services.UI
             }
 
 
-            var tasks = await App.DataBase.GetTasksAsync(_type);
+            var tasks = await App.DataBase.TaskDB.GetTasksAsync(_type);
             if (tasks.Count == 0)
             {
                 return null;
@@ -150,6 +149,71 @@ namespace Grip.Core.Services.UI
                 IsVisible = _visible,
                 IsAutoDayEnd = _autoday,
                 SaveDate = DateTime.Now
+            };
+        }
+        public static async Task<PeriodClass> UpdatePeriod(PeriodClass periodClass)
+        {
+            string title = "Редактировать период";
+      
+            string _period = await Shell.Current.DisplayActionSheet("Выбор периода", "Cancel", null, App.PeriodTypes.ToArray());
+            if (String.IsNullOrWhiteSpace(_period) | _period == "Cancel")
+            {
+                return null;
+            }
+
+            string _startDate = await Shell.Current.DisplayPromptAsync(title, $"StartDate", initialValue: periodClass.StartDate.ToShortDateString());
+            if (String.IsNullOrWhiteSpace(_startDate) | _startDate == "Cancel")
+            {
+                return null;
+            }
+
+            string _endDate = await Shell.Current.DisplayPromptAsync(title, $"EndDate", initialValue: periodClass.EndDate.ToShortDateString());
+            if (String.IsNullOrWhiteSpace(_endDate) | _endDate == "Cancel")
+            {
+                return null;
+            }
+
+            string _startTime = await Shell.Current.DisplayPromptAsync(title, $"StartTime", initialValue: periodClass.StartTime.ToString());
+            if (String.IsNullOrWhiteSpace(_startTime) | _startTime == "Cancel")
+            {
+                return null;
+            }
+
+            string _stopTime = await Shell.Current.DisplayPromptAsync(title, $"StopTime", initialValue: periodClass.StopTime.ToString());
+            if (String.IsNullOrWhiteSpace(_stopTime) | _stopTime == "Cancel")
+            {
+                return null;
+            }
+
+            string _pause = await Shell.Current.DisplayPromptAsync(title, $"Pause", initialValue: periodClass.Pause.ToString());
+            if (String.IsNullOrWhiteSpace(_pause) | _pause == "Cancel")
+            {
+                return null;
+            }
+
+            bool _active = await Shell.Current.DisplayAlert(title, $"Активный?", "Да", "Нет");
+
+            bool _notify = await Shell.Current.DisplayAlert(title, $"Присылать уведомления?", "Да", "Нет");
+
+            bool _visible = await Shell.Current.DisplayAlert(title, $"Показывать уведомления?", "Да", "Нет");
+
+            bool _autoday = await Shell.Current.DisplayAlert(title, $"Сбрасывать в новом дне?", "Да", "Нет");
+
+            return new PeriodClass
+            {
+                N = periodClass.N,
+                Id = periodClass.Id,
+                StartDate = Convert.ToDateTime(_startDate),
+                EndDate = Convert.ToDateTime(_endDate),
+                Period = PeriodParser.GetIntFromPeriodName(_period),
+                StartTime = TimeSpan.Parse(_startTime),
+                StopTime = TimeSpan.Parse(_stopTime),
+                Pause = Convert.ToInt32(_pause),
+                IsActive = _active,
+                IsNotify = _notify,
+                IsVisible = _visible,
+                IsAutoDayEnd = _autoday,
+                SaveDate = periodClass.SaveDate
             };
         }
         public static PeriodClass GetEmptyPeriod(int _taskId)

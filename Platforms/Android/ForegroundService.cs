@@ -33,7 +33,7 @@ namespace Grip.Platforms.Android
                 while (IsForegroundServiceRunning)
                 {
                     Thread.Sleep(60000);
-
+      
                     //**********Message
 
                     try
@@ -42,12 +42,10 @@ namespace Grip.Platforms.Android
 
                         if (s.Count > 0)
                         {
-                            string message = "";
                             foreach (var item in s)
                             {
-                                message = message + $"{item.TaskSoket.Name}, ";
-                            }
-                            SendNotification(message);
+                                SendNotification(item.N, item.TaskSoket.Type, item.TaskSoket.Name);
+                            }                     
                         }
                     }
                     catch (Exception ex)
@@ -110,7 +108,7 @@ namespace Grip.Platforms.Android
             return IsForegroundServiceRunning;
         }
 
-        public void SendNotification(string message)
+        public void SendNotification(int _id, string _title, string _message)
         {
             string channelID = "NotificationChannel";
             var SnotificationManager = (NotificationManager)GetSystemService(NotificationService);
@@ -119,8 +117,8 @@ namespace Grip.Platforms.Android
             SnotificationManager.CreateNotificationChannel(notfificationChannel);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelID)
-            .SetContentTitle("Notification")
-            .SetContentText(message)
+            .SetContentTitle(_title)
+            .SetContentText(_message)
             .SetSmallIcon(Resource.Drawable.abc_ic_arrow_drop_right_black_24dp);
 
             // Build the notification:
@@ -131,9 +129,8 @@ namespace Grip.Platforms.Android
                 GetSystemService(Context.NotificationService) as NotificationManager;
 
             // Publish the notification:
-            const int notificationId = 0;
-            notificationManager.Notify(notificationId, Snotification);
-
+            //const int notificationId = 0;
+            notificationManager.Notify(_id, Snotification);
         }
     }
 }
