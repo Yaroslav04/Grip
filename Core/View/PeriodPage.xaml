@@ -10,7 +10,7 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <converter:BoolYesNo x:Key="bool" />
+            <converter:BoolYesNoConverterConverter x:Key="bool" />
             <converter:PeriodConverter x:Key="period" />
         </ResourceDictionary>
     </ContentPage.Resources>

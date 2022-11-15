@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Grip.Core.Services.Converter
 {
-    public class BoolYesNo : IValueConverter
+    public class BoolYesNoConverterConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
