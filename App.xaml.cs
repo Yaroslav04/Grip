@@ -17,6 +17,21 @@ public partial class App : Application
         }
     }
 
+    static BTClass btClass;
+
+    public static BTClass BTClass
+    {
+        get
+        {
+            if (btClass == null)
+            {
+                btClass = new BTClass();
+            }
+            return btClass;
+        }
+    }
+
+
     public static List<string> TaskTypes
     {
         get
