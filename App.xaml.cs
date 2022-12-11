@@ -10,7 +10,7 @@ public partial class App : Application
         {
             if (dataBase == null)
             {
-                dataBase = new DataBase(FileManager.AppPath(), new List<string> { 
+                dataBase = new DataBase(FileManager.AppPath(), new List<string> {
                     "TaskDataBase.db3", "PeriodDataBase.db3", "ObjectDataBase.db3", "SensorDataBase.db3" });
             }
             return dataBase;
@@ -31,7 +31,21 @@ public partial class App : Application
         }
     }
 
-
+    public static List<string> SensorTypes
+    {
+        get
+        {
+            return new List<string>
+            {
+                "temperature",
+                "humidity",
+                "co",
+                "pm1",
+                "pm2.5",
+                "pm10",
+            };
+        }
+    }
     public static List<string> TaskTypes
     {
         get
@@ -82,9 +96,9 @@ public partial class App : Application
     }
 
     public App()
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
 
-		MainPage = new AppShell();
-	}
+        MainPage = new AppShell();
+    }
 }

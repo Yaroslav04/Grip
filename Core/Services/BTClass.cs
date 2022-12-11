@@ -13,84 +13,136 @@ namespace Grip.Core.Services
 {
     public class BTClass
     {
+        List<SensorClass> list;
+        DateTime span;
         BluetoothSocket _socket;
         byte[] buffer = new byte[256];
 
+        public BTClass()
+        {
+            span = DateTime.Now;
+            list = new List<SensorClass>();
+        }
+
         public async void RunAsync()
         {
-            bool sw = true;
-
-            while (sw)
-            {
-                try
-                {
-                    await ConnectBT();
-                    sw = false;
-                }
-                catch
-                {
-                    await Task.Delay(10000);
-                }
-            }
 
             while (true)
             {
-                try
+                if (_socket == null)
                 {
-                    if (!_socket.IsConnected)
+                    try
                     {
                         await ConnectBT();
                     }
-                  
-                    while (_socket.IsConnected)
+                    catch (Exception e)
                     {
-                        int i = await _socket.InputStream.ReadAsync(buffer, 0, buffer.Length);
-                        string s = Encoding.UTF8.GetString(buffer);
-                        var jsonString = s.Replace("\r", "").Replace("\n", "").Replace("\0", "");
-                        try
-                        {
-                            List<JsonRoot> items = JsonConvert.DeserializeObject<List<JsonRoot>>(jsonString);
-                            if (items.Count == 6)
-                            {
-                                DateTime dt = DateTime.Now;
-                                foreach (var item in items)
-                                {
-                                    try
-                                    {
-                                        await App.DataBase.SensorDB.SaveAsync(new SensorClass
-                                        {
-                                            Sensor = item.name,
-                                            Value = item.value,
-                                            SaveDate = dt,
-                                            DateToShow = dt.ToString()
-                                        });
-                                    }
-                                    catch
-                                    {
-
-                                    }
-                                }
-                            }                           
-                        }
-                        catch (Exception e)
-                        {
-                            System.Diagnostics.Debug.WriteLine(e.Message);
-                        }
-                        finally
-                        {
-                            buffer = new byte[256];
-                        }
+                        System.Diagnostics.Debug.WriteLine($"is null ex {e.Message}");
+                        await Task.Delay(10000);
+                        continue;
                     }
                 }
-                catch (Exception ex)
+
+                if (!_socket.IsConnected)
                 {
-                    System.Diagnostics.Debug.WriteLine(ex.ToString());
-                    await Task.Delay(10000);
+                    try
+                    {
+                        await ConnectBT();
+                    }
+                    catch (Exception e)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"is connect ex {e.Message}");
+                        await Task.Delay(10000);
+                        continue;
+                    }
                 }
-                finally
+
+                if (_socket.IsConnected)
                 {
-                    buffer = new byte[256];
+                    if (_socket.InputStream != null)
+                    {
+                        await _socket.InputStream.ReadAsync(buffer, 0, buffer.Length);
+
+                        string s = Encoding.UTF8.GetString(buffer);
+                        var jsonString = "";
+
+                        jsonString = s.Replace("\r", "").Replace("\n", "").Replace("\0", "");
+                        if (jsonString != "")
+                        {
+                            System.Diagnostics.Debug.WriteLine($"json {jsonString}");
+                            try
+                            {
+                                List<JsonRoot> items = JsonConvert.DeserializeObject<List<JsonRoot>>(jsonString);
+                                if (items.Count == 6)
+                                {
+                                    DateTime dt = DateTime.Now;
+                                    foreach (var item in items)
+                                    {
+                                        try
+                                        {
+                                            list.Add(new SensorClass
+                                            {
+                                                Sensor = item.name,
+                                                Value = Convert.ToInt32(item.value),
+                                                SaveDate = dt,
+                                            });
+                                        }
+                                        catch
+                                        {
+
+                                        }
+                                    }
+
+                                    System.Diagnostics.Debug.WriteLine($"add SensorClass");
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"json converter ex {e.Message}/n {jsonString}");
+                            }
+
+                            buffer = new byte[256];
+                            await _socket.InputStream.FlushAsync();
+                        }                                            
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"soket is null");
+                    }
                 }
+
+
+                if ((DateTime.Now - span).Minutes > 15)
+                {
+                    DateTime saveDate = DateTime.Now;                   
+                    if (list.Count > 0)
+                    {
+                        foreach (var sensor in App.SensorTypes)
+                        {
+                            try
+                            {
+                                var sens = GetMediane(sensor, saveDate);
+                                if (sens != null)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"save data base {sens.Sensor} {sens.Value}");
+                                    await App.DataBase.SensorDB.SaveAsync(sens);
+                                }
+                            }
+                            catch
+                            {
+
+                            }
+                            finally
+                            {
+                                list.Clear();
+                            }                          
+                        }
+                        
+                    }
+                    span = DateTime.Now;
+                }
+
+                buffer = new byte[256];
             }
         }
 
@@ -112,6 +164,54 @@ namespace Grip.Core.Services
 
             _socket = device.CreateRfcommSocketToServiceRecord(UUID.FromString("00001101-0000-1000-8000-00805F9B34FB"));
             await _socket.ConnectAsync();
+        }
+
+        private SensorClass GetMediane(string _sensor, DateTime _saveDate)
+        {
+            var sublist = list.Where(x => x.Sensor == _sensor).ToList();
+
+            if (sublist.Count > 0)
+            {
+                if (_sensor == App.SensorTypes[2])
+                {
+                    sublist = sublist.Where(x => x.Value > 400 & x.Value < 2000).ToList();
+                }
+
+                if (sublist.Count == 0)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+
+
+            if (sublist.Count > 0)
+            {
+                var sum = 0;
+                foreach (var item in sublist)
+                {
+                    sum = sum + item.Value;
+                }
+
+                sum = Convert.ToInt32(sum / sublist.Count);
+
+                SensorClass sensor = new SensorClass()
+                {
+                    Sensor = _sensor,
+                    Value = sum,
+                    SaveDate = _saveDate,
+                    DateToShow = _saveDate.ToString(),
+                };
+
+                return sensor;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 

@@ -13,7 +13,7 @@ namespace Grip.Core.Model
         [NotNull]
         public int N { get; set; }
         public string Sensor { get; set; }
-        public string Value { get; set; }
+        public int Value { get; set; }
         public DateTime SaveDate { get; set; }
         public string DateToShow { get; set; }
     }
