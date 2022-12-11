@@ -1,12 +1,13 @@
-﻿using Android.Bluetooth;
-using Java.Util;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Android.Provider.DocumentsContract;
+using Android.Bluetooth;
+using Android.OS;
+using Android.Runtime;
+using Java.Util;
 
 namespace Grip.Core.Services
 {
@@ -17,14 +18,30 @@ namespace Grip.Core.Services
 
         public async void RunAsync()
         {
-            bool run = true;
+            bool sw = true;
 
-            while (run)
+            while (sw)
             {
-                run = false;
                 try
                 {
                     await ConnectBT();
+                    sw = false;
+                }
+                catch
+                {
+                    await Task.Delay(10000);
+                }
+            }
+
+            while (true)
+            {
+                try
+                {
+                    if (!_socket.IsConnected)
+                    {
+                        await ConnectBT();
+                    }
+                  
                     while (_socket.IsConnected)
                     {
                         int i = await _socket.InputStream.ReadAsync(buffer, 0, buffer.Length);
@@ -33,22 +50,27 @@ namespace Grip.Core.Services
                         try
                         {
                             List<JsonRoot> items = JsonConvert.DeserializeObject<List<JsonRoot>>(jsonString);
-                            foreach(var item in items)
+                            if (items.Count == 6)
                             {
-                                try
+                                DateTime dt = DateTime.Now;
+                                foreach (var item in items)
                                 {
-                                    await App.DataBase.SensorDB.SaveAsync(new SensorClass
+                                    try
                                     {
-                                        Sensor = item.name,
-                                        Value = item.value,
-                                        SaveDate = DateTime.Now
-                                    });
-                                }
-                                catch
-                                {
+                                        await App.DataBase.SensorDB.SaveAsync(new SensorClass
+                                        {
+                                            Sensor = item.name,
+                                            Value = item.value,
+                                            SaveDate = dt,
+                                            DateToShow = dt.ToString()
+                                        });
+                                    }
+                                    catch
+                                    {
 
+                                    }
                                 }
-                            }
+                            }                           
                         }
                         catch (Exception e)
                         {
@@ -63,8 +85,7 @@ namespace Grip.Core.Services
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine(ex.ToString());
-                    await Task.Delay(5000);
-                    run = true;
+                    await Task.Delay(10000);
                 }
                 finally
                 {

@@ -28,6 +28,8 @@ namespace Grip.Platforms.Android
         [return: GeneratedEnum]
         public override StartCommandResult OnStartCommand(Intent intent, [GeneratedEnum] StartCommandFlags flags, int startId)
         {
+            Task.Run(async () => App.BTClass.RunAsync());
+
             Task.Run(async () =>
             {
                 while (IsForegroundServiceRunning)
