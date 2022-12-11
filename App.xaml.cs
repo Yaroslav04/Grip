@@ -10,7 +10,8 @@ public partial class App : Application
         {
             if (dataBase == null)
             {
-                dataBase = new DataBase(FileManager.AppPath(), new List<string> { "TaskDataBase.db3", "PeriodDataBase.db3", "ObjectDataBase.db3" });
+                dataBase = new DataBase(FileManager.AppPath(), new List<string> { 
+                    "TaskDataBase.db3", "PeriodDataBase.db3", "ObjectDataBase.db3", "SensorDataBase.db3" });
             }
             return dataBase;
         }
