@@ -15,6 +15,5 @@ namespace Grip.Core.Model
         public string Sensor { get; set; }
         public int Value { get; set; }
         public DateTime SaveDate { get; set; }
-        public string DateToShow { get; set; }
     }
 }

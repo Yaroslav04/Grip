@@ -13,6 +13,7 @@ namespace Grip.Core.Services
 {
     public class BTClass
     {
+        static int period = 15;
         List<SensorClass> list;
         DateTime span;
         BluetoothSocket _socket;
@@ -86,14 +87,15 @@ namespace Grip.Core.Services
                                                 Value = Convert.ToInt32(item.value),
                                                 SaveDate = dt,
                                             });
+                                            System.Diagnostics.Debug.WriteLine($"add SensorClass {item.name} {item.value}");
                                         }
-                                        catch
+                                        catch (Exception e )
                                         {
-
+                                            System.Diagnostics.Debug.WriteLine($"add SensorClass ex {e.Message}");
                                         }
                                     }
 
-                                    System.Diagnostics.Debug.WriteLine($"add SensorClass");
+                                    
                                 }
                             }
                             catch (Exception e)
@@ -112,7 +114,7 @@ namespace Grip.Core.Services
                 }
 
 
-                if ((DateTime.Now - span).Minutes > 15)
+                if ((DateTime.Now - span).Minutes >= period)
                 {
                     DateTime saveDate = DateTime.Now;                   
                     if (list.Count > 0)
@@ -130,14 +132,11 @@ namespace Grip.Core.Services
                             }
                             catch
                             {
-
-                            }
-                            finally
-                            {
-                                list.Clear();
-                            }                          
+                            }                       
                         }
-                        
+
+                        list.Clear();
+
                     }
                     span = DateTime.Now;
                 }
@@ -203,7 +202,6 @@ namespace Grip.Core.Services
                     Sensor = _sensor,
                     Value = sum,
                     SaveDate = _saveDate,
-                    DateToShow = _saveDate.ToString(),
                 };
 
                 return sensor;
